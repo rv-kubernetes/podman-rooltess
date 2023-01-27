@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Pod
+metadata:
+ name: no-priv
+spec:
+  # securityContext:
+  #   runAsUser: 1000
+
+  containers:
+    - name: main-pod
+      image: venerayan/podman
+      imagePullPolicy: Always
+      command: ["/bin/bash"]
+      args: ["-c", "sleep 100000"]
+      securityContext:
+        privileged: true
+        runAsUser: 1000
+        runAsGroup: 1000
+      resources:
+        limits:
+          github.com/fuse: 1
+      volumeMounts:
+        - mountPath: "/home/podman/.local/share/containers"
+          name: containers
+        # - mountPath: "/home/podman/.local/share/containers/storage"
+        #   name: storage
+        # - mountPath: "/home/podman/.local/share/containers/storage/overlay"
+        #   name: overlay
+        # - mountPath: "/home/podman/.local/share/containers/storage/libpod"
+        #   name: libpod
+        # - mountPath: "/home/podman/.local/share/containers/storage/mounts"
+        #   name: mounts
+
+  initContainers:         
+    - name: init-pod
+      image: venerayan/podman
+      imagePullPolicy: Always
+      command: ["/bin/bash"]
+      args: ["-c", "podman info && chown -R podman:podman /home/podman/.local"]
+      #args: ["-c","touch /etc/subgid /etc/subuid && chmod g=u /etc/subgid /etc/subuid && echo podman:1000:5000 > /etc/subuid"]
+      #args: ["-c", "sleep 6 && chmod -R 755 /home/podman/.local/share/containers && chown -R podman:podman /home/podman/.local/share/containers"]
+      #args: ["-c", "ls -la /home/podman/.local/share/containers && chown -R podman:podman /home/podman/.local/share/containers"]
+      securityContext:
+        privileged: true 
+        runAsUser: 0
+      volumeMounts:
+        - mountPath: "/home/podman/.local/share/containers"
+          name: containers
+        # - mountPath: "/home/podman/.local/share/containers/storage"
+        #   name: storage
+        # - mountPath: "/home/podman/.local/share/containers/storage/overlay"
+        #   name: overlay
+        # - mountPath: "/home/podman/.local/share/containers/storage/libpod"
+        #   name: libpod
+        # - mountPath: "/home/podman/.local/share/containers/storage/mounts"
+        #   name: mounts
+  
+  dnsPolicy: Default
+                    
+  volumes:
+  - name: containers
+    emptyDir: 
+      sizeLimit: 100Mi
+  # - name: storage
+  #   emptyDir: 
+  #     sizeLimit: 100M
+  # - name: overlay
+  #   emptyDir: 
+  #     sizeLimit: 100M
+  # - name: libpod
+  #   emptyDir: 
+  #     sizeLimit: 100M
+  # - name: mounts
+  #   emptyDir: 
+  #     sizeLimit: 100M
+    

@@ -1,0 +1,25 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ric-role
+  namespace: default
+rules:
+  - apiGroups: ["","extensions", "apps"]
+    resources: ["secrets","configmaps","pods","pods/attach","services","namespaces","deployments","replicasets","pods/portforward"]
+    verbs: ["get","list","watch","create","update","patch","delete"]
+  - apiGroups: ["","extensions", "apps"]
+    resources: ["pods/exec"]
+    verbs: ["create","patch","delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: clusterrole-cbinding
+subjects:
+- kind: User
+  name: ricarte
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: ric-role
+  apiGroup: rbac.authorization.k8s.io    

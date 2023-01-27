@@ -1,0 +1,74 @@
+FROM centos:centos7
+
+WORKDIR /home/podman
+
+#WORKDIR /home/podman/.local/share/containers
+ARG UID=1000
+ARG GID=1000
+
+#RUN cd /etc/yum.repos.d/ \
+#    && sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* \
+#    && sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-* \
+
+RUN yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
+   && yum update -y \
+   && yum -y install "@Development Tools" \
+   && yum install -y curl\
+   gcc \
+   make \
+   device-mapper-devel \
+   git \
+   btrfs-progs-devel \
+   conmon \
+   containernetworking-plugins \
+   containers-common \
+   git \
+   glib2-devel \
+   glibc-devel \
+   glibc-static \
+   golang-github-cpuguy83-md2man \
+   gpgme-devel \
+   iptables \
+   libassuan-devel \
+   libgpg-error-devel \
+   libseccomp-devel \
+   libselinux-devel \
+   pkgconfig \
+   systemd-devel \
+   autoconf \
+   python3 \
+   python3-devel \
+   python3-pip \
+   yajl-devel \
+   libcap-devel 
+
+RUN yum install wget -y \
+   && wget https://storage.googleapis.com/golang/getgo/installer_linux \
+   && chmod +x ./installer_linux 
+
+RUN groupadd --gid 1000 podman \
+    && useradd --uid 1000 --gid podman --shell /bin/bash --create-home podman \
+
+    # && mkdir -p /etc/containers \
+    # && curl -L -o /etc/containers/registries.conf https://src.fedoraproject.org/rpms/containers-common/raw/main/f/registries.conf \    
+    # && curl -L -o /etc/containers/policy.json https://src.fedoraproject.org/rpms/containers-common/raw/main/f/default-policy.json \
+    # && wget https://github.com/containers/podman/archive/refs/tags/v4.2.0.tar.gz \
+    # && tar xvf v4.2.0.tar.gz \
+    # && cd podman*/ \
+    # && make BUILDTAGS="selinux seccomp" \
+    # && make install PREFIX=/usr \
+    # && yum remove  gpgme-devel -y \
+    # && yum -y install https://cbs.centos.org/kojifiles/packages/gpgme/1.7.1/0.el7.centos.1/x86_64/gpgme-1.7.1-0.el7.centos.1.x86_64.rpm \
+    # && yum -y install https://cbs.centos.org/kojifiles/packages/gpgme/1.7.1/0.el7.centos.1/x86_64/gpgme-devel-1.7.1-0.el7.centos.1.x86_64.rpm \
+    # && make BUILDTAGS="selinux seccomp" \
+    # && make install PREFIX=/usr
+    # && sed -ie 's/override_kernel_check/#override_kernel_check/g' /etc/containers/storage.conf
+
+
+#    &&   
+#    && yum install -y podman
+
+#  && chown 1000:1000 -R /home/podman \
+#  && chmod -R 775 /home/podman
+
+#&& echo "podman:100000:65536" > /etc/subuid && echo "podman:100000:65536" > /etc/subgid

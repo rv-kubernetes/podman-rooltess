@@ -1,0 +1,8 @@
+FROM quay.io/podman/stable:latest
+
+WORKDIR /home/podman/.local/share/containers
+
+ARG UID=1000
+ARG GID=1000
+
+RUN chown -R podman:podman /home/podman && chmod -R 775 /home/podman && echo "podman:100000:65536" > /etc/subuid && echo "podman:100000:65536" > /etc/subgid

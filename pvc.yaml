@@ -1,0 +1,11 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: ric-pvc3
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: filestore-example
+  resources:
+    requests:
+      storage: 10Gi

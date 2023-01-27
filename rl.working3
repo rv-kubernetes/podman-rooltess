@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Pod
+metadata:
+ name: no-priv
+spec:
+  # securityContext:
+  #   runAsUser: 1000
+
+  containers:
+    - name: main-pod
+      image: quay.io/podman/stable:latest
+      imagePullPolicy: Always
+      command: ["/bin/bash"]
+      args: ["-c", "sleep 100000"]
+      securityContext:
+        privileged: true
+        runAsUser: 1000
+        runAsGroup: 1000
+      resources:
+        limits:
+          github.com/fuse: 1
+      volumeMounts:
+        - mountPath: "/home/podman/.local/share/containers"
+          name: storage
+
+  initContainers:         
+    - name: init-pod
+      image: venerayan/podman
+      imagePullPolicy: Always
+      command: ["/bin/bash"]
+      args: ["-c", "podman info && chown -R 1000:1000 /home/podman && chmod -R 777 /home/podman"]
+      securityContext:
+        privileged: true 
+        runAsUser: 0
+      volumeMounts:
+        - mountPath: "/home/podman/.local/share/containers"
+          name: storage
+  
+  dnsPolicy: Default
+                    
+  volumes:
+  - name: storage  
+    emptyDir: {}
+      # sizeLimit: 600Mi
+    # persistentVolumeClaim:
+    #   claimName: ric-pvc2
+    
